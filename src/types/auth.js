@@ -1,20 +1,19 @@
 const typeDef = `
-    type Person {
-        id: ID!
+    input RegisterInput {
         username: String
         email: String
         password: String
         role: String
     }
     
-    extend type Mutation {
-        register (username: String, email: String, password: String, role: String): Person!
-        login(username: String, password: String): LoginResponse!
-    }
-    
     type LoginResponse {
         token: String
-        user: Person
+        user: User
+    }
+    
+    extend type Mutation {
+        register (input: RegisterInput): User!
+        login(username: String, password: String): LoginResponse!
     }
 `
 
