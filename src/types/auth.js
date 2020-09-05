@@ -13,7 +13,7 @@ const typeDef = `
     
     extend type Mutation {
         register (input: RegisterInput): User!
-        login(username: String, password: String): LoginResponse!
+        login(email: String, password: String): LoginResponse!
     }
 `
 

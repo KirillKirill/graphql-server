@@ -1,6 +1,7 @@
-const { db } = require("../postgres");
+require('dotenv').config()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { db } = require("../postgres");
 const { handleErrors, ValidationError } = require("../validation")
 
 const register = async function(_, { input }){
@@ -25,13 +26,28 @@ const register = async function(_, { input }){
     }
 }
 
-const login = async function(){
+const login = async function(_, args){
+    const {email, password} = args;
 
+    const res = await db.query('select * from users where email = $1', [email]);
+    const user = res.rows[0];
+
+    if(user){
+        const match = await bcrypt.compare(password, user.password);
+        if(match){
+            const token = signJwtToken(user.id, user.role);
+            return {user, token}
+        }else{
+            throw new Error('Wrong credentials')
+        }
+    }else{
+        throw new Error('There is no user with such credentials')
+    }
 }
 
 const signJwtToken = async function(id, role) {
     const payload = { id, role };
-    return jwt.sign(payload);
+    return jwt.sign(payload, process.env.JWT_SECRET);
 }
 
 const resolvers = {
